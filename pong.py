@@ -1,6 +1,6 @@
 import pygame, random
 
-# Initialize Pygame
+
 pygame.init()
 
 # Constants
@@ -8,7 +8,7 @@ WIDTH, HEIGHT = 800, 600
 PADDLE_WIDTH, PADDLE_HEIGHT = 100, 20
 BALL_RADIUS = 10
 FPS = 60
-TARGET_SCORE = 10  # Updated target score
+TARGET_SCORE = 10  
 
 # Colors
 BLACK = (0, 0, 0)
@@ -20,7 +20,7 @@ DARK = (50, 50 ,50)
 player_score = 0
 opponent_score = 0
 
-# Screen Setup
+
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pong Game")
 
@@ -36,8 +36,8 @@ class Paddle:
             self.rect.x += self.speed
             
     def ai_move(self, ball, screen_width):
-        tolerance = 10  # Allowable range of no movement
-        if ball.vel_y < 0:  # Ball moving toward the top paddle
+        tolerance = 10  
+        if ball.vel_y < 0:  
             if abs(ball.rect.centerx - self.rect.centerx) > tolerance:
                 if ball.rect.centerx < self.rect.centerx and self.rect.left > 0:
                     self.rect.x -= self.speed
@@ -66,11 +66,10 @@ class Ball:
             self.rect.x += self.vel_x
             self.rect.y += self.vel_y
 
-            # Bounce off walls
+           
             if self.rect.left <= 0 or self.rect.right >= width:
                 self.vel_x *= -1
 
-            # Update scores and reset on top/bottom wall collision
             global player_score, opponent_score
             if self.rect.top <= 0:  # Ball passed the top paddle
                 player_score += 1
@@ -85,32 +84,32 @@ class Ball:
         self.reset_timer = pygame.time.get_ticks()
 
     def check_collision(self, paddle):
-        # Check if the ball intersects with the paddle
+        
         if self.rect.colliderect(paddle.rect):
             # Determine the side of the paddle hit
-            if abs(self.rect.bottom - paddle.rect.top) < 10 and self.vel_y > 0:  # Bottom of the ball hits the top of the paddle
+            if abs(self.rect.bottom - paddle.rect.top) < 10 and self.vel_y > 0:  
                 self.vel_y *= -1
-                self.rect.bottom = paddle.rect.top  # Prevent the ball from "sticking"
-            elif abs(self.rect.top - paddle.rect.bottom) < 10 and self.vel_y < 0:  # Top of the ball hits the bottom of the paddle
+                self.rect.bottom = paddle.rect.top  
+            elif abs(self.rect.top - paddle.rect.bottom) < 10 and self.vel_y < 0:  
                 self.vel_y *= -1
-                self.rect.top = paddle.rect.bottom  # Prevent the ball from "sticking"
-            elif abs(self.rect.right - paddle.rect.left) < 10 and self.vel_x > 0:  # Right side of the ball hits the left of the paddle
+                self.rect.top = paddle.rect.bottom  
+            elif abs(self.rect.right - paddle.rect.left) < 10 and self.vel_x > 0:  
                 self.vel_x *= -1
-                self.rect.right = paddle.rect.left  # Prevent the ball from "sticking"
-            elif abs(self.rect.left - paddle.rect.right) < 10 and self.vel_x < 0:  # Left side of the ball hits the right of the paddle
+                self.rect.right = paddle.rect.left  
+            elif abs(self.rect.left - paddle.rect.right) < 10 and self.vel_x < 0: 
                 self.vel_x *= -1
-                self.rect.left = paddle.rect.right  # Prevent the ball from "sticking"
+                self.rect.left = paddle.rect.right  
 
     def draw(self, window, color):
         pygame.draw.ellipse(window, color, self.rect)
 
 def render_game(window, paddles, ball, colors):
-    window.fill(colors["background"])  # Clear the screen
+    window.fill(colors["background"])  
     for paddle in paddles:
         paddle.draw(window, colors["paddle"])
-    ball.draw(window, colors["ball"])  # Draw the ball
-    draw_scores(window, player_score, opponent_score)  # Draw the scores
-    pygame.display.update()  # Update the screen
+    ball.draw(window, colors["ball"])  
+    draw_scores(window, player_score, opponent_score)  
+    pygame.display.update()  
 
 def handle_input(keys, paddle):
     left = keys[pygame.K_LEFT]
@@ -118,7 +117,7 @@ def handle_input(keys, paddle):
     paddle.move(left, right, WIDTH)
 
 def draw_scores(window, player_score, opponent_score):
-    font = pygame.font.Font(None, 90)  # Choose font and size
+    font = pygame.font.Font(None, 90)  
     player_text = font.render(f"{player_score}", True, DARK)
     opponent_text = font.render(f"{opponent_score}", True, DARK)
 
@@ -131,7 +130,6 @@ def draw_scores(window, player_score, opponent_score):
     window.blit(opponent_text, opponent_text_rect)
 
 def check_game_over():
-    # Only display winner if a player reaches the target score
     if player_score >= TARGET_SCORE:
         return "Player Wins!"
     elif opponent_score >= TARGET_SCORE:
@@ -143,26 +141,23 @@ def display_winner(window, message, colors):
     text = font.render(message, True, colors["ball"])
     text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
     
-    window.fill(colors["background"])  # Clear the screen
+    window.fill(colors["background"])  
     window.blit(text, text_rect)
     pygame.display.update()
 
-    # Track when the message started
     return pygame.time.get_ticks()
 
-# Colors dictionary
 COLORS = {
     "background": BLACK,
     "paddle": GREY,
     "ball": WHITE,
 }
 
-# Create Game Objects
+#Game Objects
 bottom_paddle = Paddle(WIDTH // 2 - PADDLE_WIDTH // 2 , HEIGHT - 30, PADDLE_WIDTH, PADDLE_HEIGHT, speed=5)
 top_paddle = Paddle(WIDTH // 2 - PADDLE_WIDTH // 2, 10, PADDLE_WIDTH, PADDLE_HEIGHT, speed=4)
 ball = Ball(WIDTH // 2, HEIGHT // 2, BALL_RADIUS, vel_x=5, vel_y=5)
 
-# Main Game Loop
 def main():
     global player_score, opponent_score
     clock = pygame.time.Clock()
@@ -180,19 +175,16 @@ def main():
         handle_input(keys, bottom_paddle)
 
         if not winner_displayed:
-            # Ball and paddle logic
             ball.update(WIDTH, HEIGHT)
             ball.check_collision(bottom_paddle)
             ball.check_collision(top_paddle)
             top_paddle.ai_move(ball, WIDTH)
 
-            # Check for a winner
             winner = check_game_over()
             if winner:
                 winner_displayed = True
                 winner_time = display_winner(WIN, winner, COLORS)
         else:
-            # Wait before restarting
             if pygame.time.get_ticks() - winner_time > 3000:  # 3-second delay
                 winner_displayed = False
                 player_score = 0
@@ -201,7 +193,6 @@ def main():
                 top_paddle.rect.x = WIDTH // 2 - PADDLE_WIDTH // 2
                 bottom_paddle.rect.x = WIDTH // 2 - PADDLE_WIDTH // 2
 
-        # Render the game
         render_game(WIN, [top_paddle, bottom_paddle], ball, COLORS)
 
 main()
